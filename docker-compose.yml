@@ -1,0 +1,25 @@
+version: "3.5"
+services:
+  filebeat:
+    hostname: filebeat
+# ** Here to build the image, you need to specify your own docker hub account :
+    image: bcoste/filebeat:latest
+    build:
+      context: ./filebeat
+#Deploy is needed if you want to deploy in a Swarm
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+    volumes:
+# needed to persist filebeat tracking data :
+     - "filebeat_data:/usr/share/filebeat/data:rw"
+# needed to access all docker logs :
+     - "/var/lib/docker/containers:/usr/share/dockerlogs/data:ro"
+# needed to access additional informations about containers
+     - "/var/run/docker.sock:/var/run/docker.sock"
+  
+volumes:
+# create a persistent volume for Filebeat
+  filebeat_data:
+ 
