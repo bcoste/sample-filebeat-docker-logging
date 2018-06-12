@@ -1,0 +1,57 @@
+# filebeat.yml
+
+#change data location to separate docker log files from data
+path.data: /usr/share/filebeat/data
+
+filebeat.prospectors:
+- type: log
+  json.keys_under_root: true
+  json.message_key: log
+  enabled: true
+  encoding: utf-8
+  document_type: docker
+  paths:
+    - '/usr/share/filebeat/data/*/*.log'
+processors:
+# decode the log field if json encoded, or let the log field "as is"
+- decode_json_fields:
+    fields: ["log"]
+    target: ""
+# overwrite existing target elasticsearch fields while decoding json fields    
+    overwrite_keys: true
+- add_docker_metadata: ~
+ 
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+setup.template.settings:
+  index.number_of_shards: 3
+  
+setup.kibana:
+  host: "10.110.4.100:80"
+  protocol: "http"
+#identification required for X-pack  
+  username: "my_login"
+  password: "my_password"
+#path needed if kibana not at website root  
+  path: "/kibana"
+
+output.elasticsearch:
+  hosts: ["10.110.4.100:9200"]
+  template:
+    name: "filebeat"
+    path: "fields.yml"
+    overwrite: false
+  protocol: "http"
+#identification required for X-pack  
+  username: "my_login"
+  password: "my_password"
+
+#Filebeat own logs only to file
+logging.to_files: true
+logging.to_syslog: false
+
+#X-pack optional module
+xpack.monitoring.enabled: true
+xpack.monitoring.elasticsearch:
