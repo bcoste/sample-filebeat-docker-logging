@@ -1,0 +1,22 @@
+version: "3.5"
+services:
+  javamicroservice:
+    image: bcoste/javamicroservice:latest
+    build:
+      context: ./
+      args:
+        - JAR_FILE=build/libs/javamicroservice.jar
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    networks:
+      - net
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+
+networks:
+  net:
