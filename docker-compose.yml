@@ -19,28 +19,7 @@ services:
 # needed to access additional informations about containers
      - "/var/run/docker.sock:/var/run/docker.sock"
 
-# sample microservice to test logging
-  javamicroservice:
-    image: bcoste/javamicroservice:latest
-    build:
-      context: ./javamicroservice
-      args:
-        - JAR_FILE=javamicroservice.jar
-    ports:
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: host
-    networks:
-      - net
-    deploy:
-      mode: global
-      restart_policy:
-        condition: on-failure
-
 volumes:
 # create a persistent volume for Filebeat
   filebeat_data:
- 
-networks:
-  net:
+
